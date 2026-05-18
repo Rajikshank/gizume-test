@@ -137,6 +137,7 @@ the editor text must be the final source of truth
 crawl failures should degrade gracefully
 uploaded PNGs should remain stable for social crawlers
 next/og output must stay compatible with Vercel runtime constraints
+
+
 Who Built This
 Developed by Rajikshan
-
