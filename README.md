@@ -139,5 +139,5 @@ uploaded PNGs should remain stable for social crawlers
 next/og output must stay compatible with Vercel runtime constraints
 
 
-Who Built This d
+Who Built This ds
 Developed by Rajikshan
