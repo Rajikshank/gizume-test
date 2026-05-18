@@ -140,5 +140,3 @@ next/og output must stay compatible with Vercel runtime constraints
 Who Built This
 Developed by Rajikshan
 
-License
-MIT
