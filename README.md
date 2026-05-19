@@ -15,7 +15,7 @@ it publishes a social-ready image for the final short link
 That means the shared URL looks much better on platforms like X, LinkedIn, WhatsApp, Discord, and Facebook.
  
 How It Works
-User enters URLs
+User enters URLs 
     ↓
 App crawls page metadata
     ↓
