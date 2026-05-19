@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krishnakumar Rajikshan | Full-Stack AI Engineer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-primary: #070707;
+      --bg-secondary: #0c0c0c;
+      --bg-card: #121212;
+      --bg-elevated: #181818;
+      --text-primary: #FFF8E7;
+      --text-secondary: #9A9588;
+      --text-muted: #5A5548;
+      --accent: #FF6B35;
+      --accent-secondary: #FFB627;
+      --accent-dim: rgba(255, 107, 53, 0.15);
+      --accent-glow: rgba(255, 107, 53, 0.35);
+      --border: #1f1f1f;
+      --scanline: rgba(255, 248, 231, 0.02);
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #F5F1E8;
+      --bg-secondary: #EAE6DD;
+      --bg-card: #E0DCD3;
+      --bg-elevated: #D5D1C8;
+      --text-primary: #1A1A1A;
+      --text-secondary: #5A5A5A;
+      --text-muted: #8A8A8A;
+      --accent: #E85D04;
+      --accent-secondary: #FAA307;
+      --accent-dim: rgba(232, 93, 4, 0.15);
+      --accent-glow: rgba(232, 93, 4, 0.3);
+      --border: #C8C4BC;
+      --scanline: rgba(26, 26, 26, 0.015);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      transition: background-color 0.8s cubic-bezier(0.22, 1, 0.36, 1), color 0.8s ease;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        var(--scanline) 2px,
+        var(--scanline) 4px
+      );
+      opacity: 0.5;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.45) 100%);
+      opacity: 0.7;
+    }
+    [data-theme="light"] .vignette {
+      background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.06) 100%);
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .cursor-blink::after {
+      content: '█';
+      color: var(--accent);
+      animation: blink 1s infinite;
+      margin-left: 3px;
+      font-size: 0.8em;
+    }
+
+    @keyframes glitch-anim {
+      0% { transform: translate(0); clip-path: inset(40% 0 61% 0); }
+      20% { transform: translate(-3px, 2px); clip-path: inset(92% 0 1% 0); }
+      40% { transform: translate(3px, -2px); clip-path: inset(43% 0 1% 0); }
+      60% { transform: translate(-3px, -2px); clip-path: inset(25% 0 58% 0); }
+      80% { transform: translate(3px, 2px); clip-path: inset(54% 0 7% 0); }
+      100% { transform: translate(0); clip-path: inset(40% 0 61% 0); }
+    }
+    .glitch-text {
+      position: relative;
+    }
+    .glitch-text::before,
+    .glitch-text::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+    }
+    .glitch-text:hover::before {
+      animation: glitch-anim 0.25s infinite linear alternate-reverse;
+      color: var(--accent-secondary);
+      opacity: 0.85;
+      z-index: -1;
+    }
+    .glitch-text:hover::after {
+      animation: glitch-anim 0.25s infinite linear alternate;
+      color: var(--accent);
+      opacity: 0.85;
+      z-index: -2;
+    }
+
+    .btn-retro {
+      background: var(--accent);
+      color: var(--bg-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      padding: 14px 28px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+    .btn-retro:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px var(--accent-glow);
+      filter: brightness(1.2);
+    }
+    .btn-retro:active { transform: translateY(0) scale(0.97); }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+    .btn-outline:hover {
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    .activity-cell {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+    .activity-cell:hover {
+      transform: scale(1.8);
+      z-index: 10;
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    .skill-module {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-module::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, var(--accent-dim) 50%, transparent 60%);
+      background-size: 200% 100%;
+      background-position: 100% 0;
+      transition: background-position 0.7s;
+      pointer-events: none;
+    }
+    .skill-module:hover::before {
+      background-position: -100% 0;
+    }
+    .skill-module:hover {
+      border-color: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+    }
+
+    .cartridge {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .cartridge::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .cartridge:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    }
+    .cartridge:hover::after { transform: scaleX(1); }
+
+    .terminal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .terminal::before {
+      content: '● ● ●';
+      position: absolute;
+      top: 14px; left: 18px;
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 6px;
+    }
+
+    .theme-switch {
+      width: 50px;
+      height: 26px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .theme-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 18px; height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    [data-theme="light"] .theme-switch::after {
+      left: 26px;
+      background: var(--accent-secondary);
+    }
+
+    .grid-bg {
+      background-image: 
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(circle at center, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 75%);
+    }
+
+    .level-track {
+      height: 3px;
+      background: var(--bg-elevated);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .level-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      background: var(--bg-card);
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    #konami-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 10000;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .matrix-char {
+      position: absolute;
+      color: var(--accent);
+      font-size: 13px;
+      opacity: 0.5;
+      animation: matrix-fall linear infinite;
+    }
+    @keyframes matrix-fall {
+      0% { transform: translateY(-100px); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+
+    @keyframes float-badge {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(2deg); }
+    }
+    .float-badge {
+      animation: float-badge 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 1px solid var(--accent);
+      border-radius: inherit;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+
+    .secret-reveal .secret-text {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .secret-reveal:hover .secret-text {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #hero-canvas {
+      width: 100%;
+      height: 100%;
+      max-width: 420px;
+      max-height: 420px;
+      cursor: crosshair;
+    }
+
+    /* Easter egg scramble */
+    .scramble-text {
+      display: inline-block;
+    }
+
+    /* Shooting particles from canvas */
+    .shoot-particle {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 1px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-[var(--accent)] selection:text-[var(--bg-primary)]">
+
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="noise"></div>
+
+  <!-- KONAMI EASTER EGG -->
+  <div id="konami-overlay">
+    <div class="h-full flex flex-col items-center justify-center relative z-10">
+      <h1 class="text-5xl md:text-8xl font-mono font-bold text-[var(--accent)] mb-6 tracking-tighter glitch-text" data-text="HACKER_MODE">HACKER_MODE</h1>
+      <p class="text-[var(--text-secondary)] font-mono mb-10 text-center px-6">You found the backdoor. Respect.<br>Developer access granted.</p>
+      <button onclick="closeKonami()" class="btn-retro">DISENGAGE_PROTOCOL()</button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[var(--border)] bg-[var(--bg-primary)]/60 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="font-mono text-lg font-bold tracking-tighter cursor-pointer glitch-text select-none" data-text="K_RAJIKSHAN" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        K_RAJIKSHAN
+      </div>
+      
+      <div class="hidden md:flex items-center gap-8 font-mono text-xs tracking-widest">
+        <a href="#commits" class="hover:text-[var(--accent)] transition-colors duration-300 py-2 border-b-2 border-transparent hover:border-[var(--accent)]">[COMMITS]</a>
+        <a href="#modules" class="hover:text-[var(--accent)] transition-colors duration-300 py-2 border-b-2 border-transparent hover:border-[var(--accent)]">[MODULES]</a>
+        <a href="#builds" class="hover:text-[var(--accent)] transition-colors duration-300 py-2 border-b-2 border-transparent hover:border-[var(--accent)]">[BUILDS]</a>
+        <a href="#logs" class="hover:text-[var(--accent)] transition-colors duration-300 py-2 border-b-2 border-transparent hover:border-[var(--accent)]">[LOGS]</a>
+        <a href="#channel" class="hover:text-[var(--accent)] transition-colors duration-300 py-2 border-b-2 border-transparent hover:border-[var(--accent)]">[LINK]</a>
+        <div class="theme-switch" onclick="toggleTheme()" role="button" aria-label="Toggle theme"></div>
+      </div>
+
+      <button class="md:hidden text-[var(--accent)] text-xl" onclick="toggleMobile()" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div id="mobile-menu" class="fixed inset-0 bg-[var(--bg-primary)] z-40 hidden flex-col items-center justify-center gap-8 font-mono text-lg">
+    <button onclick="toggleMobile()" class="absolute top-6 right-6 text-[var(--text-secondary)] text-2xl"><i class="fas fa-times"></i></button>
+    <a href="#commits" onclick="toggleMobile()" class="hover:text-[var(--accent)] transition-colors">[COMMITS]</a>
+    <a href="#modules" onclick="toggleMobile()" class="hover:text-[var(--accent)] transition-colors">[MODULES]</a>
+    <a href="#builds" onclick="toggleMobile()" class="hover:text-[var(--accent)] transition-colors">[BUILDS]</a>
+    <a href="#logs" onclick="toggleMobile()" class="hover:text-[var(--accent)] transition-colors">[LOGS]</a>
+    <a href="#channel" onclick="toggleMobile()" class="hover:text-[var(--accent)] transition-colors">[LINK]</a>
+    <div class="theme-switch" onclick="toggleTheme()"></div>
+  </div>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-30"></div>
+    <div class="absolute top-0 right-0 w-1/2 h-1/2 bg-[var(--accent)] opacity-[0.04] blur-[150px] rounded-full pointer-events-none"></div>
+    
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center w-full relative z-10">
+      <!-- Text -->
+      <div class="order-2 md:order-1 space-y-8">
+        <div class="inline-block float-badge">
+          <span class="font-mono text-[var(--accent)] text-xs tracking-[0.3em] border border-[var(--border)] px-4 py-2 rounded-sm bg-[var(--bg-card)]">
+            > SYSTEM.INIT() <span class="cursor-blink"></span>
+          </span>
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.85] tracking-tight">
+          KRISHNA<br>KUMAR<br>
+          <span class="text-[var(--accent)] glitch-text inline-block mt-2" data-text="RAJIKSHAN">RAJIKSHAN</span>
+        </h1>
+        
+        <div class="h-14 flex items-center">
+          <span id="typewriter" class="font-mono text-lg md:text-xl text-[var(--text-secondary)]"></span>
+          <span class="cursor-blink"></span>
+        </div>
+
+        <p class="text-[var(--text-secondary)] text-base md:text-lg max-w-lg leading-relaxed border-l-2 border-[var(--accent)] pl-6">
+          Fresh out of the lab. 2+ years in the trenches. I build LLM pipelines that scale and web apps that slap. 
+          MERN stack specialist. AI integrator. Currently accepting new missions.
+        </p>
+
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="#channel" class="btn-retro">INITIATE_CONTACT()</a>
+          <a href="#builds" class="btn-retro btn-outline">VIEW_DEPLOYMENTS()</a>
+        </div>
+
+        <div class="flex gap-6 pt-4 font-mono text-xs text-[var(--text-secondary)] tracking-wider">
+          <a href="https://github.com" target="_blank" class="hover:text-[var(--accent)] transition-colors flex items-center gap-2 group">
+            <i class="fab fa-github group-hover:scale-110 transition-transform"></i> GITHUB
+          </a>
+          <a href="https://linkedin.com" target="_blank" class="hover:text-[var(--accent)] transition-colors flex items-center gap-2 group">
+            <i class="fab fa-linkedin group-hover:scale-110 transition-transform"></i> LINKEDIN
+          </a>
+          <a href="mailto:krajikshan637@gmail.com" class="hover:text-[var(--accent)] transition-colors flex items-center gap-2 group">
+            <i class="fas fa-envelope group-hover:scale-110 transition-transform"></i> EMAIL
+          </a>
+        </div>
+      </div>
+
+      <!-- 8-bit Canvas -->
+      <div class="order-1 md:order-2 flex justify-center items-center relative">
+        <div class="relative">
+          <canvas id="hero-canvas" width="400" height="400"></canvas>
+          <div class="absolute -bottom-10 left-0 right-0 text-center font-mono text-[10px] text-[var(--text-muted)] tracking-widest uppercase">
+            [ Interactive: Move Mouse / Click to Shoot / Auto-Cycles K↔R ]
+          </div>
+          <div class="absolute -top-5 -left-5 w-10 h-10 border-t-2 border-l-2 border-[var(--accent)] opacity-40"></div>
+          <div class="absolute -bottom-5 -right-5 w-10 h-10 border-b-2 border-r-2 border-[var(--accent)] opacity-40"></div>
+          <div class="absolute top-1/2 -left-8 w-4 h-4 border border-[var(--accent)] opacity-20 rounded-full"></div>
+          <div class="absolute bottom-1/4 -right-8 w-6 h-6 border border-[var(--accent)] opacity-20 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+      <i class="fas fa-chevron-down text-[var(--accent)]"></i>
+    </div>
+  </section>
+
+  <!-- ACTIVITY GRAPH -->
+  <section id="commits" class="py-28 md:py-36 relative">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="section-label">$ git log --graph --oneline</div>
+      
+      <h2 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight cursor-blink">COMMIT_HISTORY</h2>
+      <p class="text-[var(--text-secondary)] font-mono text-sm mb-12 max-w-xl">
+        2,847 contributions over 24 months. Every glowing pixel represents a problem dismantled, 
+        a feature shipped, or a 3AM debugging session survived.
+      </p>
+
+      <div class="terminal p-8 pt-12 overflow-x-auto rounded-lg">
+        <div id="activity-graph" class="flex gap-[3px] min-w-max"></div>
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-8 gap-4 font-mono text-[10px] text-[var(--text-muted)] tracking-wider">
+          <span>May 2023 — Boot sequence initiated</span>
+          <div class="flex items-center gap-2">
+            <span>LOW</span>
+            <div class="w-3 h-3 rounded-[2px] bg-[var(--bg-primary)] border border-[var(--border)]"></div>
+            <div class="w-3 h-3 rounded-[2px]" style="background: var(--accent); opacity: 0.2;"></div>
+            <div class="w-3 h-3 rounded-[2px]" style="background: var(--accent); opacity: 0.45;"></div>
+            <div class="w-3 h-3 rounded-[2px]" style="background: var(--accent); opacity: 0.75;"></div>
+            <div class="w-3 h-3 rounded-[2px]" style="background: var(--accent); box-shadow: 0 0 8px var(--accent);"></div>
+            <span>HIGH</span>
+          </div>
+          <span>Present — System operational</span>
+        </div>
+      </div>
+
+      <!-- Hidden stat row -->
+      <div class="mt-6 flex flex-wrap gap-6 font-mono text-xs text-[var(--text-muted)]">
+        <span class="hover:text-[var(--accent)] transition-colors cursor-default secret-reveal">
+          <i class="fas fa-code-branch mr-1"></i> 142 Repos
+          <span class="secret-text block text-[var(--accent)] text-[10px] mt-1">Most are private. Obviously.</span>
+        </span>
+        <span class="hover:text-[var(--accent)] transition-colors cursor-default secret-reveal">
+          <i class="fas fa-bug mr-1"></i> 0 Bugs Left
+          <span class="secret-text block text-[var(--accent)] text-[10px] mt-1">...that I know of.</span>
+        </span>
+        <span class="hover:text-[var(--accent)] transition-colors cursor-default secret-reveal">
+          <i class="fas fa-coffee mr-1"></i> 847 Coffees
+          <span class="secret-text block text-[var(--accent)] text-[10px] mt-1">Fuel for the machine.</span>
+        </span>
+        <span class="hover:text-[var(--accent)] transition-colors cursor-default secret-reveal" onclick="this.querySelector('.secret-text').style.opacity=1; this.querySelector('.secret-text').style.transform='translateY(0)'">
+          <i class="fas fa-moon mr-1"></i> 200+ All-Nighters
+          <span class="secret-text block text-[var(--accent)] text-[10px] mt-1">Sleep is for the weak.</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="modules" class="py-28 md:py-36 bg-[var(--bg-secondary)] relative overflow-hidden">
+    <div class="absolute inset-0 grid-bg opacity-15"></div>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <div class="section-label">$ ls -la /core/modules/ --human-readable</div>
+      
+      <h2 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight cursor-blink">CORE_MODULES</h2>
+      <p class="text-[var(--text-secondary)] font-mono text-sm mb-14 max-w-xl">
+        Hover to load proficiency data. Click to compile. Double-click if you're feeling dangerous.
+        <span class="text-[var(--accent)] block mt-1 text-xs opacity-70">Pro tip: Try clicking the icons rapidly.</span>
+      </p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20" id="skills-container"></div>
+
+      <!-- Neofetch card -->
+      <div class="terminal p-8 pt-12 rounded-lg max-w-3xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8 font-mono text-sm">
+          <div class="space-y-3 text-[var(--text-secondary)]">
+            <p><span class="text-[var(--accent)]">OS:</span> Full-Stack AI Engineer v2.5</p>
+            <p><span class="text-[var(--accent)]">Host:</span> Sri Lanka Technological Campus</p>
+            <p><span class="text-[var(--accent)]">Kernel:</span> BSc(Hons) Software Engineering</p>
+            <p><span class="text-[var(--accent)]">Uptime:</span> 2+ Years Production</p>
+            <p><span class="text-[var(--accent)]">Shell:</span> zsh + AI plugins</p>
+          </div>
+          <div class="space-y-3 text-[var(--text-secondary)]">
+            <p><span class="text-[var(--accent)]">DE:</span> VS Code, Postman, Docker</p>
+            <p><span class="text-[var(--accent)]">WM:</span> MERN Stack, Next.js</p>
+            <p><span class="text-[var(--accent)]">Terminal:</span> LangChain, Pinecone, CrewAI</p>
+            <p><span class="text-[var(--accent)]">Theme:</span> Retro-Modern [Active]</p>
+            <p class="text-xs opacity-50 mt-4 italic cursor-pointer hover:text-[var(--accent)] transition-colors" onclick="this.textContent='> rm -rf /imposter_syndrome'">
+              "Talk is cheap. Show me the code."
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="builds" class="py-28 md:py-36 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="section-label">$ ls /deployed/builds/ --classified --verbose</div>
+      
+      <h2 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight cursor-blink">DEPLOYED_BUILDS</h2>
+      <p class="text-[var(--text-secondary)] font-mono text-sm mb-14 max-w-xl">
+        Production-grade systems. Double-click any cartridge to inspect debug info.
+        <span class="text-[var(--accent)] block mt-1 text-xs opacity-70">Easter egg: Hover over the build numbers.</span>
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8" id="projects-container"></div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="logs" class="py-28 md:py-36 bg-[var(--bg-secondary)] relative">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="section-label">$ sudo cat /var/log/battle.log | grep SPM | tail -n 20</div>
+      
+      <h2 class="text-4xl md:text-6xl font-bold mb-14 tracking-tight cursor-blink">FIELD_RECORDS</h2>
+
+      <div class="terminal p-8 pt-12 rounded-lg experience-card">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+          <div>
+            <h3 class="text-2xl md:text-3xl font-bold text-[var(--accent)] tracking-tight glitch-text" data-text="SPM Batticaloa">SPM Batticaloa</h3>
+            <p class="font-mono text-sm text-[var(--text-secondary)] mt-1">Trainee FullStack AI Engineer</p>
+          </div>
+          <span class="font-mono text-xs text-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 border border-[var(--accent)]/20 rounded-sm whitespace-nowrap cursor-pointer hover:bg-[var(--accent)]/20 transition-colors" onclick="this.textContent='Still going strong 💪'">
+            May 2023 — Present
+          </span>
+        </div>
+
+        <div class="space-y-5 text-[var(--text-primary)] text-sm md:text-base leading-relaxed">
+          <div class="flex gap-4 group cursor-default p-2 rounded hover:bg-[var(--bg-primary)]/30 transition-colors">
+            <span class="text-[var(--accent)] font-mono mt-1 group-hover:scale-125 transition-transform origin-center">></span>
+            <p>Architected <span class="text-[var(--accent)] font-semibold">4 scalable web applications</span> using MERN stack & Next.js. Clients didn't ask for responsive—they got addicted to it.</p>
+          </div>
+          <div class="flex gap-4 group cursor-default p-2 rounded hover:bg-[var(--bg-primary)]/30 transition-colors">
+            <span class="text-[var(--accent)] font-mono mt-1 group-hover:scale-125 transition-transform origin-center">></span>
+            <p>Engineered <span class="text-[var(--accent)] font-semibold">3 LangChain-based LLM APIs</span> with Pinecone/PGVector search. 1200+ requests/day, 99.9% uptime. Sleep is optional.</p>
+          </div>
+          <div class="flex gap-4 group cursor-default p-2 rounded hover:bg-[var(--bg-primary)]/30 transition-colors">
+            <span class="text-[var(--accent)] font-mono mt-1 group-hover:scale-125 transition-transform origin-center">></span>
+            <p>Redesigned client portal UI → <span class="text-[var(--accent)] font-semibold">40% engagement boost</span>, 15% bounce rate drop. Numbers don't lie.</p>
+          </div>
+          <div class="flex gap-4 group cursor-default p-2 rounded hover:bg-[var(--bg-primary)]/30 transition-colors">
+            <span class="text-[var(--accent)] font-mono mt-1 group-hover:scale-125 transition-transform origin-center">></span>
+            <p>Deployed CI/CD with GitHub Actions + Docker. <span class="text-[var(--accent)] font-semibold">Cut latency by 40%</span>, cloud costs by 25%. Efficiency is the game.</p>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-[var(--border)] font-mono text-xs text-[var(--text-secondary)] flex flex-wrap gap-3">
+          <span class="px-3 py-1.5 bg-[var(--bg-primary)] rounded-sm border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all cursor-default">MERN</span>
+          <span class="px-3 py-1.5 bg-[var(--bg-primary)] rounded-sm border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all cursor-default">Next.js</span>
+          <span class="px-3 py-1.5 bg-[var(--bg-primary)] rounded-sm border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all cursor-default">LangChain</span>
+          <span class="px-3 py-1.5 bg-[var(--bg-primary)] rounded-sm border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all cursor-default">Docker</span>
+          <span class="px-3 py-1.5 bg-[var(--bg-primary)] rounded-sm border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all cursor-default">CI/CD</span>
+          <span class="px-3 py-1.5 bg-[var(--bg-primary)] rounded-sm border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all cursor-default">Pinecone</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="py-28 md:py-36 relative">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="section-label">$ sudo apt-get upgrade knowledge --yes --force</div>
+      
+      <h2 class="text-4xl md:text-6xl font-bold mb-14 tracking-tight cursor-blink">SYSTEM_UPGRADES</h2>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="skill-module p-8 rounded-lg cursor-pointer group" onclick="triggerGlitch(this)">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-14 h-14 bg-[var(--accent)]/10 flex items-center justify-center rounded-sm border border-[var(--accent)]/20 relative pulse-ring">
+              <i class="fas fa-graduation-cap text-2xl text-[var(--accent)]"></i>
+            </div>
+            <span class="font-mono text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] px-3 py-1 rounded-sm border border-[var(--border)]">2021 — 2025</span>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-[var(--accent)] transition-colors">BSc (Hons) Software Engineering</h3>
+          <p class="text-[var(--text-secondary)] text-sm">Sri Lanka Technological Campus</p>
+          <div class="mt-4 font-mono text-xs text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            > Degree.exe compiled successfully. Zero errors.
+          </div>
+        </div>
+
+        <div class="skill-module p-8 rounded-lg flex flex-col items-center justify-center cursor-pointer group min-h-[200px] relative overflow-hidden" onclick="decryptSector(this)">
+          <div class="absolute inset-0 bg-[var(--accent)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-14 h-14 bg-[var(--bg-secondary)] flex items-center justify-center rounded-sm border border-[var(--border)] mb-4 group-hover:border-[var(--accent)] transition-colors relative z-10">
+            <i class="fas fa-lock text-2xl text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors" id="edu-lock"></i>
+          </div>
+          <p class="font-mono text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors relative z-10" id="edu-label">Encrypted Sector</p>
+          <p class="font-mono text-xs text-[var(--accent)] mt-3 opacity-0 transition-all duration-500 secret-text relative z-10 transform translate-y-2" id="edu-secret">Always learning. Always building.</p>
+          <div class="absolute bottom-2 right-3 font-mono text-[9px] text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity">Click to decrypt</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="channel" class="py-28 md:py-36 bg-[var(--bg-secondary)] relative">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <div class="section-label mx-auto">$ nc -zv krishnakumar.dev 1337</div>
+      
+      <h2 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight cursor-blink">OPEN_CHANNEL</h2>
+      <p class="text-[var(--text-secondary)] text-lg mb-14 max-w-xl mx-auto leading-relaxed">
+        I'm currently <span class="text-[var(--accent)] font-mono font-bold">AVAILABLE_FOR_HIRE</span>. 
+        If you've got a challenge that needs a builder who codes like it's 1999 and deploys like it's 2026, 
+        initiate transmission below.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-4 mb-14">
+        <a href="mailto:krajikshan637@gmail.com" class="skill-module p-6 rounded-lg group text-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-[var(--accent)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <i class="fas fa-envelope text-2xl text-[var(--accent)] mb-3 group-hover:scale-110 transition-transform duration-300 inline-block relative z-10"></i>
+          <p class="font-mono text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors relative z-10 break-all">
+            krajikshan637@gmail.com
+          </p>
+        </a>
+        <a href="https://linkedin.com" target="_blank" class="skill-module p-6 rounded-lg group text-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-[var(--accent)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <i class="fab fa-linkedin text-2xl text-[var(--accent)] mb-3 group-hover:scale-110 transition-transform duration-300 inline-block relative z-10"></i>
+          <p class="font-mono text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors relative z-10">LinkedIn</p>
+        </a>
+        <a href="https://github.com" target="_blank" class="skill-module p-6 rounded-lg group text-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-[var(--accent)]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <i class="fab fa-github text-2xl text-[var(--accent)] mb-3 group-hover:scale-110 transition-transform duration-300 inline-block relative z-10"></i>
+          <p class="font-mono text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors relative z-10">GitHub</p>
+        </a>
+      </div>
+
+      <div class="terminal p-8 pt-12 rounded-lg text-left max-w-lg mx-auto font-mono text-sm group hover:border-[var(--accent)]/30 transition-colors cursor-text" id="contact-terminal">
+        <p class="text-[var(--text-secondary)] mb-1"><span class="text-[var(--accent)]">guest@portfolio:~$</span> hire krishnakumar --force</p>
+        <p class="text-[var(--accent)] mb-1">Analyzing skill matrix...</p>
+        <p class="text-[var(--text-primary)] mb-1">Status: <span class="text-[var(--accent)] animate-pulse font-bold">AVAILABLE</span></p>
+        <p class="text-[var(--text-secondary)] mb-1">Location: Batticaloa, Sri Lanka</p>
+        <p class="text-[var(--text-secondary)] mb-3">Response Time: &lt; 24hrs</p>
+        <p class="text-[var(--accent)] typing-effect border-r-2 border-[var(--accent)] pr-1 inline-block">
+          Ready to deploy. Let's build something legendary._
+        </p>
+        <div class="mt-4 text-[10px] text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" id="terminal-secret">
+          P.S. I also do freelance. No project too weird.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 border-t border-[var(--border)] text-center relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <p class="font-mono text-xs text-[var(--text-muted)] tracking-wider mb-3">
+        © 2026 Krishnakumar Rajikshan. Built with caffeine, code, and retro soul.
+      </p>
+      <p class="font-mono text-[10px] text-[var(--text-muted)] opacity-50 hover:opacity-100 hover:text-[var(--accent)] transition-all cursor-default select-none" id="konami-hint" onclick="triggerMiniKonami()">
+        ↑ ↑ ↓ ↓ ← → ← → B A — Try it.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // ===== THEME =====
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const saved = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+
+    // ===== MOBILE =====
+    function toggleMobile() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+      menu.classList.toggle('flex');
+    }
+
+    // ===== TYPEWRITER =====
+    const phrases = [
+      'Full-Stack AI Engineer',
+      'LLM Pipeline Architect',
+      'MERN Stack Specialist',
+      'Vector Database Wrangler',
+      'Available for Hire'
+    ];
+    let pIdx = 0, cIdx = 0, deleting = false;
+    const tw = document.getElementById('typewriter');
+
+    function typeLoop() {
+      const cur = phrases[pIdx];
+      tw.textContent = deleting ? cur.substring(0, cIdx - 1) : cur.substring(0, cIdx + 1);
+      cIdx += deleting ? -1 : 1;
+      
+      let speed = deleting ? 35 : 85;
+      if (!deleting && cIdx === cur.length) { speed = 2200; deleting = true; }
+      else if (deleting && cIdx === 0) { deleting = false; pIdx = (pIdx + 1) % phrases.length; speed = 300; }
+      
+      setTimeout(typeLoop, speed);
+    }
+    typeLoop();
+
+    // ===== HERO CANVAS: K/R WITH SHOOTING =====
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [], mouse = { x: -1000, y: -1000 };
+    let currentLetter = 'K';
+    let letterTimer = 0;
+    let shootParticles = [];
+    let morphProgress = 0;
+    let isMorphing = false;
+
+    const kMap = [
+      [1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,0],
+      [1,0,0,0,0,1,0,0],
+      [1,0,0,0,1,0,0,0],
+      [1,0,0,1,1,0,0,0],
+      [1,0,1,0,0,1,0,0],
+      [1,1,0,0,0,0,1,0],
+      [1,0,0,0,0,0,0,1]
+    ];
+
+    const rMap = [
+      [1,1,1,1,1,1,0,0],
+      [1,0,0,0,0,0,1,0],
+      [1,0,0,0,0,0,1,0],
+      [1,1,1,1,1,1,0,0],
+      [1,0,1,0,0,0,0,0],
+      [1,0,0,1,0,0,0,0],
+      [1,0,0,0,1,0,0,0],
+      [1,0,0,0,0,1,0,0]
+    ];
+
+    function getMap(letter) {
+      return letter === 'K' ? kMap : rMap;
+    }
+
+    function setupCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      initLetter(currentLetter, true);
+    }
+
+    function initLetter(letter, instant = false) {
+      const rect = canvas.getBoundingClientRect();
+      const map = getMap(letter);
+      // Make pixels larger to fill frame better
+      const size = Math.min(rect.width, rect.height) / 10; 
+      const offX = (rect.width - map[0].length * size) / 2;
+      const offY = (rect.height - map.length * size) / 2;
+      
+      if (instant || particles.length === 0) {
+        particles = [];
+        for (let r = 0; r < map.length; r++) {
+          for (let c = 0; c < map[r].length; c++) {
+            if (map[r][c]) {
+              particles.push({
+                x: offX + c * size + size/2,
+                y: offY + r * size + size/2,
+                bx: offX + c * size + size/2,
+                by: offY + r * size + size/2,
+                s: size * 0.78,
+                vx: 0, vy: 0,
+                phase: Math.random() * Math.PI * 2,
+                colorOffset: Math.random()
+              });
+            }
+          }
+        }
+      } else {
+        // Morph: update target positions
+        let idx = 0;
+        for (let r = 0; r < map.length; r++) {
+          for (let c = 0; c < map[r].length; c++) {
+            if (map[r][c]) {
+              if (idx < particles.length) {
+                particles[idx].bx = offX + c * size + size/2;
+                particles[idx].by = offY + r * size + size/2;
+                idx++;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function spawnShootParticles(cx, cy) {
+      const rect = canvas.getBoundingClientRect();
+      const count = 28;
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 / count) * i + Math.random() * 0.4;
+        const dist = 70 + Math.random() * 120;
+        shootParticles.push({
+          x: cx,
+          y: cy,
+          tx: Math.cos(angle) * dist,
+          ty: Math.sin(angle) * dist,
+          size: 3 + Math.random() * 5,
+          color: Math.random() > 0.5 ? getComputedStyle(document.body).getPropertyValue('--accent').trim() : '#FFB627',
+          life: 1,
+          vx: Math.cos(angle) * (2 + Math.random() * 3),
+          vy: Math.sin(angle) * (2 + Math.random() * 3)
+        });
+      }
+    }
+
+    function drawCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      
+      const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+      const secondary = getComputedStyle(document.body).getPropertyValue('--accent-secondary').trim();
+      
+      // Auto-cycle letters every 5 seconds
+      letterTimer++;
+      if (letterTimer > 300 && !isMorphing) { // ~5s at 60fps
+        letterTimer = 0;
+        isMorphing = true;
+        const nextLetter = currentLetter === 'K' ? 'R' : 'K';
+        initLetter(nextLetter);
+        setTimeout(() => {
+          currentLetter = nextLetter;
+          isMorphing = false;
+        }, 800);
+        // Explosion on switch
+        spawnShootParticles(rect.width/2, rect.height/2);
+      }
+      
+      // Draw letter particles
+      particles.forEach((p, i) => {
+        const floatY = Math.sin(Date.now() * 0.002 + p.phase) * 4;
+        const dx = mouse.x - canvas.getBoundingClientRect().left - p.x;
+        const dy = mouse.y - canvas.getBoundingClientRect().top - p.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const force = Math.max(0, 140 - dist) / 140;
+        
+        if (dist < 140 && dist > 0) {
+          p.vx -= (dx / dist) * force * 4;
+          p.vy -= (dy / dist) * force * 4;
+        }
+        
+        p.vx += (p.bx - p.x) * 0.08;
+        p.vy += (p.by - p.y + floatY - p.y) * 0.08;
+        p.vx *= 0.88;
+        p.vy *= 0.88;
+        
+        p.x += p.vx;
+        p.y += p.vy;
+        
+        const color = p.colorOffset > 0.6 ? secondary : accent;
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 18;
+        ctx.fillRect(p.x - p.s/2, p.y - p.s/2, p.s, p.s);
+        
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(p.x - p.s/4, p.y - p.s/4, p.s/2.5, p.s/2.5);
+      });
+      
+      // Draw shooting particles
+      shootParticles = shootParticles.filter(sp => {
+        sp.life -= 0.018;
+        if (sp.life <= 0) return false;
+        
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.vx *= 0.96;
+        sp.vy *= 0.96;
+        
+        const size = sp.size * sp.life;
+        
+        ctx.fillStyle = sp.color;
+        ctx.globalAlpha = sp.life;
+        ctx.shadowColor = sp.color;
+        ctx.shadowBlur = 12;
+        ctx.fillRect(sp.x - size/2, sp.y - size/2, size, size);
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+        
+        return true;
+      });
+      
+      // Draw letter indicator
+      ctx.font = 'bold 11px JetBrains Mono';
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = 0.6;
+      ctx.fillText(`[ ${currentLetter} ]`, rect.width - 45, rect.height - 12);
+      ctx.globalAlpha = 1;
+      
+      requestAnimationFrame(drawCanvas);
+    }
+
+    canvas.addEventListener('mousemove', e => {
+      const r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+    canvas.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
+    
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      
+      spawnShootParticles(cx, cy);
+      
+      // Explode letter particles outward
+      particles.forEach(p => {
+        const dx = p.x - cx;
+        const dy = p.y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        const force = 18 + Math.random() * 12;
+        p.vx += (dx/dist) * force;
+        p.vy += (dy/dist) * force;
+      });
+      
+      // Switch letter on click
+      if (!isMorphing) {
+        isMorphing = true;
+        const nextLetter = currentLetter === 'K' ? 'R' : 'K';
+        initLetter(nextLetter);
+        setTimeout(() => {
+          currentLetter = nextLetter;
+          isMorphing = false;
+        }, 800);
+        letterTimer = 0;
+      }
+    });
+
+    window.addEventListener('resize', () => { setupCanvas(); });
+    setupCanvas();
+    drawCanvas();
+
+    // ===== ACTIVITY GRAPH =====
+    const graph = document.getElementById('activity-graph');
+    const weeks = 52;
+    const days = 7;
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    
+    for (let w = 0; w < weeks; w++) {
+      const col = document.createElement('div');
+      col.className = 'flex flex-col gap-[3px]';
+      
+      for (let d = 0; d < days; d++) {
+        let intensity = Math.floor(Math.random() * 5);
+        if (w > 40) intensity = Math.min(4, intensity + 2);
+        if (w > 15 && w < 25) intensity = Math.min(4, intensity + 1);
+        if (Math.random() > 0.94) intensity = 4;
+        
+        const cell = document.createElement('div');
+        cell.className = 'activity-cell';
+        
+        // Use inline styles for reliable colors
+        const opacities = [0, 0.2, 0.45, 0.75, 1];
+        const opacity = opacities[intensity];
+        const hasGlow = intensity === 4 ? 'box-shadow: 0 0 10px var(--accent);' : '';
+        const bg = intensity === 0 ? 'var(--bg-primary)' : 'var(--accent)';
+        const border = intensity === 0 ? '1px solid var(--border)' : 'none';
+        
+        cell.style.background = bg;
+        cell.style.opacity = opacity;
+        cell.style.border = border;
+        if (hasGlow) cell.style.cssText += hasGlow;
+        
+        const commitCount = intensity * 3 + Math.floor(Math.random()*3);
+        cell.title = `${dayNames[d]} Week ${w+1}: ${commitCount} commits`;
+        
+        // Easter egg: click to "commit"
+        cell.addEventListener('click', function() {
+          this.style.background = 'var(--accent)';
+          this.style.opacity = '1';
+          this.style.boxShadow = '0 0 15px var(--accent)';
+          this.style.transform = 'scale(2)';
+          setTimeout(() => {
+            this.style.background = bg;
+            this.style.opacity = opacity;
+            this.style.boxShadow = '';
+            this.style.transform = '';
+          }, 500);
+        });
+        
+        col.appendChild(cell);
+      }
+      graph.appendChild(col);
+    }
+
+    // ===== SKILLS =====
+    const skills = [
+      { n: 'JavaScript', i: 'fa-js', l: 92 },
+      { n: 'Python', i: 'fa-python', l: 88 },
+      { n: 'Java', i: 'fa-java', l: 78 },
+      { n: 'C', i: 'fa-c', l: 72 },
+      { n: 'Node.js', i: 'fa-node', l: 90 },
+      { n: 'Express', i: 'fa-server', l: 87 },
+      { n: 'React', i: 'fa-react', l: 91 },
+      { n: 'Next.js', i: 'fa-n', l: 86 },
+      { n: 'Tailwind', i: 'fa-wind', l: 89 },
+      { n: 'FastAPI', i: 'fa-bolt', l: 84 },
+      { n: 'LangChain', i: 'fa-link', l: 87 },
+      { n: 'CrewAI', i: 'fa-robot', l: 82 },
+      { n: 'PostgreSQL', i: 'fa-database', l: 85 },
+      { n: 'Prisma', i: 'fa-cube', l: 83 },
+      { n: 'Docker', i: 'fa-docker', l: 86 },
+      { n: 'Git', i: 'fa-git-alt', l: 90 }
+    ];
+
+    const skContainer = document.getElementById('skills-container');
+    skills.forEach((s, idx) => {
+      const el = document.createElement('div');
+      el.className = 'skill-module p-5 rounded-lg group cursor-pointer select-none';
+      el.innerHTML = `
+        <div class="flex items-center justify-between mb-3 relative z-10">
+          <i class="fab ${s.i} text-xl text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300"></i>
+          <span class="font-mono text-[10px] text-[var(--text-secondary)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[var(--bg-primary)] px-2 py-0.5 rounded">${s.l}%</span>
+        </div>
+        <p class="font-mono text-xs font-bold relative z-10 group-hover:text-[var(--accent)] transition-colors duration-300">${s.n}</p>
+        <div class="level-track relative z-10">
+          <div class="level-fill" data-w="${s.l}"></div>
+        </div>
+        <div class="font-mono text-[10px] text-[var(--accent)] mt-2 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 status-msg"></div>
+      `;
+      
+      el.addEventListener('mouseenter', () => {
+        el.querySelector('.level-fill').style.width = s.l + '%';
+      });
+      el.addEventListener('mouseleave', () => {
+        el.querySelector('.level-fill').style.width = '0%';
+      });
+      el.addEventListener('click', () => {
+        const msgs = ['> COMPILED', '> OPTIMIZED', '> DEPLOYED', '> BUG_FREE', '> SAVAGE_MODE', '> PRODUCTION_READY', '> NICE_CLICK'];
+        const msg = el.querySelector('.status-msg');
+        msg.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+        msg.style.opacity = 1;
+        gsap.from(el, { scale: 0.96, duration: 0.12, yoyo: true, repeat: 1 });
+      });
+      
+      skContainer.appendChild(el);
+    });
+
+    // ===== PROJECTS =====
+    const projects = [
+      {
+        t: 'GIZUME',
+        s: 'GitHub Resume Automation',
+        d: 'Automated resume generation pipeline using Next.js, Node.js, and GitHub GraphQL API. Containerized with Docker on VPS. Zero-downtime deployments, 99.9% uptime.',
+        tags: ['Next.js','Node.js','Docker','GraphQL'],
+        grad: 'linear-gradient(135deg, #ea580c 0%, #dc2626 100%)'
+      },
+      {
+        t: 'HIVE_HUB',
+        s: 'AI-Powered Job Portal',
+        d: 'LangChain + Pinecone recommendation engine. 35% match accuracy improvement. Vector search powered by Google Gemini embeddings. PostgreSQL with vector support.',
+        tags: ['LangChain','Pinecone','Prisma','Gemini AI'],
+        grad: 'linear-gradient(135deg, #d97706 0%, #ea580c 100%)'
+      },
+      {
+        t: 'ZAYLO',
+        s: 'Scalable E-Commerce',
+        d: 'Next.js + Drizzle ORM platform. 40% faster API responses. Streamlined file uploads via UploadThing. Secure media management with PostgreSQL-backed architecture.',
+        tags: ['Next.js','Drizzle','PostgreSQL','Tailwind'],
+        grad: 'linear-gradient(135deg, #ca8a04 0%, #d97706 100%)'
+      }
+    ];
+
+    const prContainer = document.getElementById('projects-container');
+    projects.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'cartridge rounded-lg overflow-hidden group';
+      el.innerHTML = `
+        <div class="h-40 relative overflow-hidden p-6 flex flex-col justify-end" style="background: ${p.grad}">
+          <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px);"></div>
+          <div class="absolute top-4 right-4 flex gap-1.5">
+            <div class="w-2 h-2 rounded-full bg-white/40 animate-pulse"></div>
+            <div class="w-2 h-2 rounded-full bg-white/60"></div>
+          </div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] text-white/60 tracking-widest build-num cursor-help hover:text-white transition-colors" title="Build hash: ${Math.random().toString(36).substring(7)}">
+            BUILD_0${i+1}.exe
+          </div>
+          <div class="relative z-10">
+            <h3 class="text-3xl font-bold text-white tracking-tight">${p.t}</h3>
+          </div>
+        </div>
+        <div class="p-6 relative z-10">
+          <p class="text-xs text-[var(--text-secondary)] font-mono mb-4 uppercase tracking-wider">${p.s}</p>
+          <p class="text-sm text-[var(--text-primary)] mb-5 leading-relaxed">${p.d}</p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            ${p.tags.map(t => `<span class="text-[10px] font-mono bg-[var(--bg-secondary)] text-[var(--accent)] px-2.5 py-1 border border-[var(--border)] rounded-sm hover:border-[var(--accent)] transition-colors cursor-default">${t}</span>`).join('')}
+          </div>
+          <div class="flex gap-5 font-mono text-xs">
+            <span class="text-[var(--accent)] hover:underline cursor-pointer relative group">
+              [LIVE_SITE]
+              <span class="absolute -top-6 left-0 text-[9px] text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Coming soon</span>
+            </span>
+            <span class="text-[var(--text-secondary)] hover:text-[var(--accent)] cursor-pointer transition-colors">[SOURCE_CODE]</span>
+          </div>
+        </div>
+      `;
+      
+      el.addEventListener('dblclick', () => {
+        gsap.to(el, {
+          rotationY: 360,
+          duration: 0.7,
+          ease: 'power2.inOut',
+          onComplete: () => gsap.set(el, { rotationY: 0 })
+        });
+      });
+      
+      // Easter egg: hover build number
+      const buildNum = el.querySelector('.build-num');
+      buildNum.addEventListener('mouseenter', () => {
+        buildNum.textContent = 'SECRET_BUILD';
+      });
+      buildNum.addEventListener('mouseleave', () => {
+        buildNum.textContent = `BUILD_0${i+1}.exe`;
+      });
+      
+      prContainer.appendChild(el);
+    });
+
+    // ===== GSAP ANIMATIONS =====
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero elements
+    gsap.from('.order-2 > *', {
+      y: 40,
+      opacity: 0,
+      duration: 0.9,
+      stagger: 0.1,
+      ease: 'power3.out',
+      delay: 0.2
+    });
+
+    // Activity cells
+    gsap.from('.activity-cell', {
+      scale: 0,
+      opacity: 0,
+      duration: 0.35,
+      stagger: 0.0025,
+      ease: 'back.out(1.7)',
+      scrollTrigger: { trigger: '#commits', start: 'top 80%', toggleActions: 'play none none reverse' }
+    });
+
+    // Skills
+    gsap.from('#skills-container .skill-module', {
+      y: 25,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.05,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: '#modules', start: 'top 75%', toggleActions: 'play none none reverse' }
+    });
+
+    // Projects
+    gsap.from('.cartridge', {
+      y: 40,
+      opacity: 0,
+      duration: 0.7,
+      stagger: 0.12,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '#builds', start: 'top 75%', toggleActions: 'play none none reverse' }
+    });
+
+    // Experience
+    gsap.from('.experience-card', {
+      x: -30,
+      opacity: 0,
+      duration: 0.7,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: '#logs', start: 'top 80%', toggleActions: 'play none none reverse' }
+    });
+
+    // Section headings
+    gsap.utils.toArray('section').forEach(sec => {
+      const h2 = sec.querySelector('h2');
+      if (h2) {
+        gsap.from(h2, {
+          y: 15,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: sec, start: 'top 85%', toggleActions: 'play none none reverse' }
+        });
+      }
+    });
+
+    // ===== EASTER EGGS & UTILS =====
+    function triggerGlitch(el) {
+      gsap.to(el, {
+        x: 4,
+        duration: 0.04,
+        repeat: 6,
+        yoyo: true,
+        ease: 'none',
+        onComplete: () => gsap.set(el, { x: 0 })
+      });
+    }
+
+    function decryptSector(el) {
+      const lock = el.querySelector('#edu-lock');
+      const label = el.querySelector('#edu-label');
+      const secret = el.querySelector('#edu-secret');
+      
+      lock.classList.remove('fa-lock');
+      lock.classList.add('fa-lock-open');
+      lock.style.color = 'var(--accent)';
+      
+      label.textContent = 'DECRYPTED';
+      label.style.color = 'var(--accent)';
+      
+      secret.style.opacity = 1;
+      secret.style.transform = 'translateY(0)';
+      
+      gsap.from(el, { scale: 0.98, duration: 0.1, yoyo: true, repeat: 3 });
+    }
+
+    function triggerMiniKonami() {
+      const hint = document.getElementById('konami-hint');
+      hint.textContent = 'Nice try. Use your keyboard.';
+      hint.style.color = 'var(--accent)';
+      setTimeout(() => {
+        hint.textContent = '↑ ↑ ↓ ↓ ← → ← → B A — Try it.';
+        hint.style.color = '';
+      }, 2000);
+    }
+
+    // Konami
+    let sequence = [];
+    const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    document.addEventListener('keydown', e => {
+      sequence.push(e.key);
+      sequence = sequence.slice(-10);
+      if (sequence.join(',') === code.join(',')) {
+        document.getElementById('konami-overlay').style.display = 'block';
+        for (let i = 0; i < 50; i++) {
+          const span = document.createElement('span');
+          span.className = 'matrix-char';
+          span.textContent = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'[Math.floor(Math.random()*50)];
+          span.style.left = Math.random()*100 + '%';
+          span.style.animationDuration = (3+Math.random()*7) + 's';
+          span.style.animationDelay = Math.random()*3 + 's';
+          document.getElementById('konami-overlay').appendChild(span);
+        }
+      }
+    });
+
+    function closeKonami() {
+      const overlay = document.getElementById('konami-overlay');
+      overlay.style.display = 'none';
+      overlay.querySelectorAll('.matrix-char').forEach(c => c.remove());
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Navbar shadow
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 50) nav.classList.add('shadow-lg', 'shadow-black/5');
+      else nav.classList.remove('shadow-lg', 'shadow-black/5');
+    });
+
+    // Random background glitch on double click anywhere
+    let glitchTimeout;
+    document.addEventListener('dblclick', () => {
+      document.body.style.filter = 'hue-rotate(90deg) contrast(1.2)';
+      clearTimeout(glitchTimeout);
+      glitchTimeout = setTimeout(() => {
+        document.body.style.filter = '';
+      }, 200);
+    });
+
+    // Console easter egg
+    console.log('%c STOP RIGHT THERE ', 'background: #FF6B35; color: #000; font-size: 24px; font-weight: bold;');
+    console.log('%c Looking for bugs? Good luck. ', 'color: #FF6B35; font-size: 14px;');
+    console.log('%c ↑↑↓↓←→←→BA ', 'color: #FFB627; font-size: 12px;');
+  </script>
+</body>
+</html>
