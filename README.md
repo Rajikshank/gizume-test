@@ -13,7 +13,7 @@ it generates artwork related to the content
 it gives the user an editor to refine the thumbnail
 it publishes a social-ready image for the final short link
 That means the shared URL looks much better on platforms like X, LinkedIn, WhatsApp, Discord, and Facebook.
-
+ 
 How It Works
 User enters URLs
     ↓
