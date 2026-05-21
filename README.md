@@ -16,7 +16,7 @@ That means the shared URL looks much better on platforms like X, LinkedIn, Whats
  
 How It Works
 User enters URLs hello
-    ↓
+    ↓d
 App crawls page metadata
     ↓
 AI generates SVG artwork + draft copy
