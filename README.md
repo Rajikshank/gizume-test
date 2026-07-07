@@ -13,20 +13,20 @@ it generates artwork related to the content
 it gives the user an editor to refine the thumbnail
 it publishes a social-ready image for the final short link
 That means the shared URL looks much better on platforms like X, LinkedIn, WhatsApp, Discord, and Facebook.
- 
+
 How It Works
 User enters URLs hello
-    ↓d
+↓d
 App crawls page metadata
-    ↓
+↓
 AI generates SVG artwork + draft copy
-    ↓
+↓
 User edits title, subtitle, font, colors, and layout
-    ↓
+↓
 App renders final PNG with next/og
-    ↓
+↓
 PNG is attached as the OG image for the share URL
-    ↓
+↓
 User shares the bundle anywhere
 Main Features
 Add one or more URLs to a single bundle
@@ -56,17 +56,17 @@ Image rendering: next/og
 Deployment: Vercel
 Project Structure
 src/
-  agents/         Generation orchestration
-  app/            Pages, routes, server actions
-  components/     UI and editor components
-  lib/            Shared logic and data helpers
-  tools/          Crawl, SVG generation, rendering, storage
+agents/ Generation orchestration
+app/ Pages, routes, server actions
+components/ UI and editor components
+lib/ Shared logic and data helpers
+tools/ Crawl, SVG generation, rendering, storage
 
 public/
-  fonts/          Bundled fonts used by the renderer
+fonts/ Bundled fonts used by the renderer
 
 supabase/
-  schema.sql      Database schema
+schema.sql Database schema
 Important Routes
 / Landing page
 /editor/[code] Thumbnail editor
@@ -138,6 +138,5 @@ crawl failures should degrade gracefully
 uploaded PNGs should remain stable for social crawlers
 next/og output must stay compatible with Vercel runtime constraints
 
-
 Who Built This ds
-Developed by Rajikshan
+Developed by Rajikshan 2026
