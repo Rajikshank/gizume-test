@@ -36,7 +36,7 @@ Edit share title and subtitle in a dedicated editor
 Adjust font, alignment, size, colors, and text position
 Publish a final PNG for social sharing
 Create a unique public bundle URL
-Show all links on a clean public share page
+Show all links on a clean public share pagesdsdsd
 Example Use Cases
 Creator link collections
 Product launch bundles
